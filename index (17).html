@@ -1,0 +1,633 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>IN©EST😈</title>
+<style>
+:root{
+  --bg-light:#2c2c2c;
+  --text:#e6eef6;
+  --muted:#97a1ac;
+  --btn-blue:#1d74f2; 
+  --btn-verde:#6eff9b;
+  --btn-verde-borde:#33cc7a;
+}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Roboto,Inter,system-ui,"Helvetica Neue",Arial;
+  background:var(--bg-light);
+  color:var(--text);
+}
+.app-wrap{
+  width:100%;
+  max-width:100%;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  height:100vh;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+
+/* POPUPS DE NOTIFICACIÓN COMPACTO Y OVALADO */
+.popup-notification {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-100px);
+  width: 85%;
+  max-width: 290px;
+  background: rgba(23, 33, 43, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.8);
+  z-index: 2000;
+  opacity: 0;
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease;
+}
+.popup-notification.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+.popup-avatar-wrapper { 
+  position: relative; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0; 
+}
+
+/* Foto pequeña de iniciales */
+.popup-avatar-wrapper.user-access {
+  width: 38px; 
+  height: 38px;
+  margin-left: 4px;
+}
+.popup-avatar-initial { 
+  width: 100%; 
+  height: 100%; 
+  border-radius: 50%; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  color: #fff; 
+  font-weight: bold; 
+  font-size: 14px; 
+  text-transform: uppercase; 
+}
+
+/* Tamaño multimedia hot */
+.popup-avatar-wrapper.media-type {
+  width: 56px;
+  height: 56px;
+}
+.popup-avatar-blur { 
+  width: 100%; 
+  height: 100%; 
+  border-radius: 14px; 
+  filter: blur(5px) brightness(0.85) contrast(1.2) saturate(1.5);
+  object-fit: cover; 
+  background: linear-gradient(135deg, #e17055 10%, #ff7675 50%, #3a2323 90%); 
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Triángulo blanco nativo de play */
+.popup-video-play { 
+  position: absolute; 
+  inset: 0; 
+  margin: auto; 
+  width: 0; 
+  height: 0; 
+  border-top: 7px solid transparent;
+  border-bottom: 7px solid transparent;
+  border-left: 12px solid #ffffff; 
+  background: transparent;
+}
+.popup-status-dot { position: absolute; width: 9px; height: 9px; background: #4cc764; border: 1.5px solid #17212b; border-radius: 50%; bottom: -1px; right: -1px; }
+
+.popup-content { display: flex; flex-direction: column; overflow: hidden; text-align: left; }
+.popup-group-name { font-size: 11px; font-weight: bold; color: #5288c1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.popup-user-name { font-size: 13px; font-weight: 600; color: #ffffff; margin: 1px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.popup-action { font-size: 11px; color: #7f91a4; display: flex; align-items: center; gap: 4px; }
+
+/* INTERFAZ CENTRAL */
+.main-title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  color: #ffffff;
+  max-width: 320px;
+}
+
+#groupSection{
+  background:#0e1621;
+  padding:25px 30px;
+  border-radius:24px;
+  text-align:center;
+  display:block;
+  opacity:1;
+  width: 85%;
+  max-width: 400px;
+  margin-bottom: 40px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+}
+.group-photo{width:80px;height:80px;border-radius:50%;border:2px solid var(--btn-blue);object-fit:cover;margin-bottom:8px;}
+.channel-name{font-size:18px;font-weight:700;margin-bottom:4px;}
+.channel-sub{color:var(--muted);font-size:13px;margin-bottom:15px;}
+
+/* EFECTO 3D AVANZADO EN MINIATURAS DEL HEADER */
+.mini-thumbs { 
+  display: flex; 
+  justify-content: center; 
+  margin: 12px 0; 
+  perspective: 400px; 
+}
+.mini-thumbs img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #0e1621;
+  margin-left: -10px;
+  box-shadow: -4px 4px 8px rgba(0, 0, 0, 0.7), inset 0 0 4px rgba(255,255,255,0.2); 
+  transform: rotateY(-20px) rotateX(10px) translateZ(0); 
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.mini-thumbs img:hover {
+  transform: translateZ(10px) scale(1.1); 
+  box-shadow: -6px 6px 12px rgba(0, 0, 0, 0.9);
+}
+
+.channel-info{color:var(--muted);font-size:13px;margin-bottom:20px;}
+
+#warningText {
+  color: #ff4a4a;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+#shareBtn {
+  background: var(--btn-blue);
+  border: none;
+  color: #fff;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 14px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  box-shadow: 0 4px 15px rgba(29,116,242,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+#shareBtn svg { width: 22px; height: 22px; fill: #ffffff; }
+
+.progress-container {
+  width: 85%;
+  background: #1c2732;
+  height: 10px;
+  border-radius: 10px;
+  margin: 25px auto 12px auto;
+  position: relative;
+}
+.progress-bar {
+  width: 0%;
+  background: #ffffff;
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.3s ease;
+}
+.progress-thumb {
+  position: absolute;
+  height: 16px;
+  width: 16px;
+  background: #ffffff;
+  border-radius: 50%;
+  top: -3px;
+  left: 0%;
+  transform: translateX(-50%);
+  transition: left 0.3s ease;
+}
+
+.counter-text {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #ffffff;
+}
+.counter-text .red-num { color: #ff3b30; }
+
+#acceptRulesBtn{
+  background: var(--btn-blue);
+  border:none;
+  color:#fff;
+  width: 100%;
+  padding:14px 20px;
+  border-radius:14px;
+  font-size: 16px;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(29,116,242,0.4);
+}
+#accessBtn {
+  background:var(--btn-verde);
+  border:none;
+  color:#000;
+  width: 100%;
+  padding:14px 20px;
+  border-radius:14px;
+  font-size: 16px;
+  font-weight:700;
+  cursor:pointer;
+  display:none;
+  text-decoration: none;
+}
+#shareBtn:disabled, #acceptRulesBtn:disabled {
+  background:#2c3742 !important;
+  box-shadow:none;
+  cursor:not-allowed;
+  opacity:0.5;
+  color: #556575;
+}
+
+#message {
+  color: #7f91a4;
+  font-size: 13px;
+  margin-top: 15px;
+  line-height: 1.5;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+#message .info-icon {
+  font-style: normal;
+  font-weight: bold;
+  color: #7f91a4;
+  font-size: 14px;
+  margin-top: 1px;
+}
+
+#smallText{color:#ff6666;font-size:11px;margin-top:4px;display:none;}
+.vibrate{animation:vibrate 0.3s linear;}
+@keyframes vibrate{
+  0%{transform:translateX(0);}
+  25%{transform:translateX(-3px);}
+  50%{transform:translateX(3px);}
+  75%{transform:translateX(-3px);}
+  100%{transform:translateX(0);}
+}
+
+/* REGLAS PREVIAS */
+#rulesContainer {
+  display: none;
+  background: #182533;
+  border: 1px solid #2b5278;
+  border-radius: 14px;
+  margin: 15px 0;
+  padding: 14px;
+  text-align: left;
+}
+.rules-header-tag {
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #5288c1;
+  font-weight: bold;
+  margin-bottom: 8px;
+  display: block;
+}
+#rulesScrollBox {
+  height: 140px;
+  overflow-y: scroll;
+  background: #101921;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #e4ecf2;
+  white-space: pre-wrap;
+}
+#rulesScrollBox::-webkit-scrollbar { width: 5px; }
+#rulesScrollBox::-webkit-scrollbar-thumb { background: #2b5278; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<div id="popupContainer" class="popup-notification"></div>
+
+<div class="app-wrap">
+  
+  <div class="main-title">
+    You're Applicable To Join<br>The Free Group! 🎉
+  </div>
+
+  <div id="groupSection">
+    <img class="group-photo" src="https://i.ibb.co/v4bs8PZ4/IMG-20260305-124523-025.jpg" alt="Group">
+    <div class="channel-name">IN©EST😈</div>
+    <div class="channel-sub">Grupo privado</div>
+    <div class="mini-thumbs" id="miniThumbs"></div>
+    <div class="channel-info" id="channelInfo">𝙉𝙚𝙣𝙖 𝙝𝙤𝙩😏, alex... y 16,550 miembros más</div>
+
+    <div id="rulesContainer">
+      <span class="rules-header-tag">Group Terms & Conditions (Step 3/3)</span>
+      <div id="rulesScrollBox">✅ᎡᎬᏀᏞᎪՏ ᎠᎬ└ ᏀᎡႮႮϴ 📝
+
+🔞 <b>PROHIBIDO</b>: Ofrecer, solicitar o subir pornografía infantil y cualquier otro contenido ilegal.
+⛔️ <b>Castigo</b>: Ban general y permanente en múltiples grupos
+
+🔗 No se permiten enlaces de ningún tipo.
+⛔ <b>Castigo</b>: advertencia y al segundo serás expulsado
+
+🔁 No intercambios ni mensajes privados, el grupo fue creado con el fin de compartir el contenido con todos los miembros.
+⛔️ <b>Castigo</b>: Cualquiera que solicite un intercambio será silenciado por unos días.
+
+🚯 El grupo es para contribuciones porno así que EVITA enviar fotos de tu pene o tus selfies a menos que te lo pidan, no estamos en Tinder, la gente viene a ver porno no a un gilipollas urgente.
+⛔️ <b>Castigo</b>: Silenciado 2 días
+
+💳 No envíes datos personales u otros, formas de hacking, tiktok o kawaii códigos.
+⛔️ <b>Castigo</b>: Silenciado 1 día.
+
+🗑️ Las personas que solo usan el grupo para solicitar mensajes privados y chismes sin hacer contribuciones serán consideradas <b>SPAM</b> así como la imagen preferida por el urgente "Dime hola y te mostraré en privado"
+⛔️ <b>Castigo</b>: Advertencia y al segundo serás silenciado.
+
+🛎️ Para comunicarte con un admin usa el comando: ⦃@admin⦄ 
+
+🆘 <b>Para reportar algo inapropiado como</b>:
+ ├💳 <i>Datos personales</i>
+ ├‎✋🏻 <b>Abuso infantil</b>
+ ├🔪 <i>Violencia</i>
+ ├💊 <b>Drogas</b>
+ ├🗑️ <i>Spam</i>
+ └‎❗ <i>Otros</i>
+👉🏻Usa el comando ⦃/reporte⦄ respondiendo al mensaje o archivo⚠️
+
+
+🔇 ¿Has sido silenciado por romper una regla y no quieres esperar al tiempo de castigo? Comparte el enlace del grupo 2 veces en cualquier Red Social
+
+🔗 Enlace del grupo: https://kut.lat/eEva
+
+👉 <b>VUELVE Y PRESIONA EL BOTÓN ✅ Acceder</b>✅</div>
+    </div>
+
+    <div class="button-wrapper">
+      
+      <div id="warningText">
+         ⚠️ Please complete all steps to prevent system spam.
+      </div>
+
+      <button id="shareBtn">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15.15-.31.3-.47.45l-7.7 7.33c-.16.15-.38.22-.6.18l-2.67-.53c-.47-.09-.54-.64-.11-.84l13.6-6.32c.45-.21.9.18.77.67l-2.82-.94zM9.36 15.26l.32 1.39c.05.23.33.31.49.14l1.25-1.3-2.06-.23z"></path>
+        </svg>
+        SHARE
+      </button>
+
+      <div class="progress-container" id="pContainer">
+        <div class="progress-bar" id="pBar"></div>
+        <div class="progress-thumb" id="pThumb"></div>
+      </div>
+
+      <div class="counter-text" id="counterContainer">
+        <span class="red-num" id="currentStep">0</span>/5
+      </div>
+
+      <button id="acceptRulesBtn" style="display:none;" disabled>I Accept the Rules & Join</button>
+      <button id="accessBtn" style="display:none; background:var(--btn-verde); border:none; color:#000; width: 100%; padding:14px 20px; border-radius:14px; font-size: 16px; font-weight:700; cursor:pointer;">Join Chat Now 👈</button>
+      
+    </div>
+
+    <div id="message">
+      <span class="info-icon">ⓘ</span>
+      <span>You need 5 actual joins — not just 5 shares. Your invite link must result in real members joining.</span>
+    </div>
+    
+    <div id="smallText"></div>
+  </div>
+</div>
+
+<script>
+const shareBtn=document.getElementById("shareBtn");
+const acceptRulesBtn=document.getElementById("acceptRulesBtn");
+const accessBtn=document.getElementById("accessBtn");
+const message=document.getElementById("message");
+const smallText=document.getElementById("smallText");
+const miniThumbs=document.getElementById("miniThumbs");
+const popupContainer=document.getElementById("popupContainer");
+const rulesContainer=document.getElementById("rulesContainer");
+const rulesScrollBox=document.getElementById("rulesScrollBox");
+const pBar=document.getElementById("pBar");
+const pThumb=document.getElementById("pThumb");
+const currentStep=document.getElementById("currentStep");
+const pContainer=document.getElementById("pContainer");
+const counterContainer=document.getElementById("counterContainer");
+const warningText=document.getElementById("warningText");
+
+const enlaceDestino = "tg://join?invite=oIlou09fTJZmODY5";
+
+
+// Miniaturas del Header Fijo
+const miniaturas=[ 
+  "https://i.ibb.co/jvpwSDYh/IMG-20260621-093615-904.jpg","https://i.ibb.co/pvBjnr4w/IMG-20260628-090021-257.jpg","https://i.ibb.co/1tR2XpWL/2-1.jpg",
+  "https://i.ibb.co/0yGmfxT3/FB-IMG-1770230948105.jpg","https://i.ibb.co/gMfBZwxR/IMG-20260218-122600-537.jpg","https://i.ibb.co/pvBjnr4w/IMG-20260628-090021-257.jpg"
+];
+
+// TUS NUEVOS ENLACES EXCLUSIVOS PARA ROTAR EN LOS POPUPS DE VIDEO/FOTO
+const miniaturasPopup = [
+  "https://i.ibb.co/7x6JqB8L/IMG-20260628-090816-262.jpg",
+  "https://i.ibb.co/FbXJF9k1/IMG-20260628-090817-039.jpg",
+  "https://i.ibb.co/N6kYV0GN/IMG-20260628-091130-789.jpg",
+  "https://i.ibb.co/1GGPK6R3/IMG-20260627-093618-782.jpg",
+  "https://i.ibb.co/fGtN7rcH/IMG-20260621-051710-057.jpg",
+  "https://i.ibb.co/nsRGwqNJ/IMG-20260621-051704-439.jpg",
+  "https://i.ibb.co/FL04Lqgd/legion-packs-250x250.jpg",
+  "https://i.ibb.co/gZkdNQHv/IMG-20260605-230021-143.jpg",
+  "https://i.ibb.co/Hp7TLJ9M/packs-filtrados.jpg",
+  "https://i.ibb.co/Dfrhvkp8/IMG-20260507-063506-886.jpg",
+  "https://i.ibb.co/W4Y36hwp/6-1-1.jpg",
+  "https://i.ibb.co/q3Qxgq0F/IMG-20260506-155451-686.jpg"
+];
+
+const nombresCortos = ["Alex G.", "Sofi V.", "Dan K.", "Max", "Leo R.", "Mery", "John", "Chris"];
+const nombresRusos = ["Dmitry", "Ivan", "Anastasia", "Nikolai", "Vladimir", "Mikhail", "Svetlana", "Artem"];
+const perfilSoloEmojis = ["🍒😈🔥", "🔞🔞", "🍌🍑✨", "😈🔥", "🍒🔞"];
+
+function generarNombreVariado() {
+  const tipo = Math.floor(Math.random() * 3);
+  if (tipo === 0) {
+    return nombresCortos[Math.floor(Math.random() * nombresCortos.length)];
+  } else if (tipo === 1) {
+    return nombresRusos[Math.floor(Math.random() * nombresRusos.length)];
+  } else {
+    return perfilSoloEmojis[Math.floor(Math.random() * perfilSoloEmojis.length)];
+  }
+}
+
+const avatarColors = ["#e17055", "#0984e3", "#00b894", "#6c5ce7", "#74b9ff", "#a29bfe"];
+let shares=0;
+let lastClickTime = 0;
+
+setTimeout(triggerPopupLoop, 1500);
+
+shareBtn.addEventListener("click",()=>{
+  const currentTime = new Date().getTime();
+  
+  if (currentTime - lastClickTime < 3500 && lastClickTime !== 0) {
+    alert("Please wait a few seconds before sharing again.");
+    return;
+  }
+  
+  lastClickTime = currentTime;
+  shares++;
+  
+  // AQUI EL CAMBIO: Quitamos el "if(shares <= 2)" para permitir los 5 clics
+  if(shares <= 5){
+    window.open("https://t.me/share/url?url=🔞IN©EST😈:https://kut.lat/eEva ","_blank");
+    
+    const porcentaje = (shares / 5) * 100;
+    pBar.style.width = porcentaje + "%";
+    pThumb.style.left = porcentaje + "%";
+    currentStep.textContent = shares;
+  }
+  
+  // Esta parte ya estaba bien, ahora sí se ejecutará al llegar a 5
+  if(shares === 5){
+    shareBtn.style.display = "none";
+    pContainer.style.display = "none";
+    counterContainer.style.display = "none";
+    warningText.style.display = "none";
+    message.style.display = "none";
+    
+    rulesContainer.style.display = "block";
+    acceptRulesBtn.style.display = "block";
+    rulesScrollBox.addEventListener("scroll", verificarScrollReglas);
+  }
+});
+
+ 
+
+function verificarScrollReglas() {
+  if (rulesScrollBox.scrollHeight - rulesScrollBox.scrollTop <= rulesScrollBox.clientHeight + 12) {
+    acceptRulesBtn.disabled = false;
+    acceptRulesBtn.style.background = "var(--btn-verde)";
+    acceptRulesBtn.style.color = "#000";
+    acceptRulesBtn.style.boxShadow = "0 4px 12px rgba(110,255,155,0.4)";
+  }
+}
+
+acceptRulesBtn.addEventListener("click", () => {
+  rulesContainer.style.display = "none";
+  acceptRulesBtn.style.display = "none";
+  accessBtn.style.display = "block";
+});
+
+accessBtn.addEventListener("click", (e) => {
+  e.preventDefault();
+  accessBtn.classList.add("vibrate");
+
+  // Intentamos abrir el esquema tg://
+  window.location.href = enlaceDestino;
+
+  // Si después de 2 segundos no se abrió, damos una alternativa
+  setTimeout(() => {
+    window.location.href = "https://t.me/+oIlou09fTJZmODY5";
+  }, 2000);
+
+  setTimeout(() => accessBtn.classList.remove("vibrate"), 400);
+});
+
+
+
+
+function actualizarMiniaturas(){
+  miniThumbs.innerHTML="";
+  const seleccion=miniaturas.sort(()=>0.5-Math.random()).slice(0,3);
+  seleccion.forEach(url=>{
+    const img=document.createElement("img");
+    img.src=url;
+    miniThumbs.appendChild(img);
+  });
+}
+actualizarMiniaturas();
+
+function generatePopupHTML(type, name, randomImg) {
+  const groupName = "IN©EST😈 ";
+  let avatarHTML = "";
+  let actionHTML = "";
+  let wrapperClass = "";
+
+  if (type === 0) {
+    wrapperClass = "user-access"; 
+    const inicial = name.charAt(0).toUpperCase();
+    const randomColor = avatarColors[Math.floor(Math.random() * avatarColors.length)];
+    avatarHTML = `
+      <div class="popup-avatar-initial" style="background-color: ${randomColor};">${inicial || "🍒"}</div>
+      <div class="popup-status-dot"></div>
+    `;
+    actionHTML = `<span>🔐 Access Granted</span>`;
+  } 
+  else if (type === 1) { 
+    wrapperClass = "media-type"; 
+    avatarHTML = `<img class="popup-avatar-blur" src="${randomImg}" alt="thumb">`;
+    actionHTML = `<span>🖼️ Photo</span>`;
+  } 
+  else if (type === 2) { 
+    wrapperClass = "media-type"; 
+    avatarHTML = `
+      <img class="popup-avatar-blur" src="${randomImg}" alt="thumb">
+      <div class="popup-video-play"></div>
+    `;
+    actionHTML = `<span>🎬 Video</span>`;
+  }
+
+  return `
+    <div class="popup-avatar-wrapper ${wrapperClass}">${avatarHTML}</div>
+    <div class="popup-content">
+      <div class="popup-group-name">${groupName}</div>
+      <div class="popup-user-name">${name}</div>
+      <div class="popup-action">${actionHTML}</div>
+    </div>
+  `;
+}
+
+let popupSequenceCounter = 0;
+function triggerPopupLoop() {
+  const randomName = generarNombreVariado();
+  const randomImg = miniaturasPopup[Math.floor(Math.random() * miniaturasPopup.length)];
+  let selectedType = 0;
+  
+  if (popupSequenceCounter === 2) {
+    selectedType = Math.random() > 0.5 ? 1 : 2;
+    popupSequenceCounter = 0;
+  } else {
+    selectedType = 0;
+    popupSequenceCounter++;
+  }
+
+  popupContainer.innerHTML = generatePopupHTML(selectedType, randomName, randomImg);
+  popupContainer.classList.add("show");
+
+  setTimeout(() => {
+    popupContainer.classList.remove("show");
+    setTimeout(triggerPopupLoop, 3000); 
+  }, 4000); 
+}
+</script>
+</body>
+          </html>
